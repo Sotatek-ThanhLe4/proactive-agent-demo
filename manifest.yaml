@@ -65,9 +65,9 @@ contributes:
         export: ExampleToolResult
         styles: dist/ui/app.css
 service:
-  baseUrl: https://sotaagents-app-proactive-agent.invalid
+  baseUrl: https://sotaagent-app-proactive-demo-staging.up.railway.app
 health:
-  url: https://sotaagents-app-proactive-agent.invalid/health
+  url: https://sotaagent-app-proactive-demo-staging.up.railway.app/health
   intervalSeconds: 60
 environments:
   local:
@@ -75,6 +75,11 @@ environments:
       baseUrl: http://localhost:8787
     health:
       url: http://localhost:8787/health
+  stg:
+    service:
+      baseUrl: https://sotaagent-app-proactive-demo-staging.up.railway.app
+    health:
+      url: https://sotaagent-app-proactive-demo-staging.up.railway.app/health
 platform: ^1.2.0
 locales:
   default: en
