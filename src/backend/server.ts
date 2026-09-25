@@ -128,28 +128,28 @@ app.use((error: unknown, _request: express.Request, response: express.Response, 
   response.status(500).json({ code: 'APP_ERROR', message: 'Request failed' });
 });
 
-const expectedPort = 8787;
-const port = Number(process.env.PORT ?? expectedPort);
+// Local dev uses the manifest's fixed port (8787); a hosted platform (Railway,
+// etc.) injects its own PORT and needs the process to bind whatever it is given
+// on 0.0.0.0 so external traffic reaches the container. So: accept any valid
+// PORT, default to 8787 for local, and bind 0.0.0.0 in production while keeping
+// localhost for local dev (HOST override lets you force either).
+const defaultPort = 8787;
+const port = Number(process.env.PORT ?? defaultPort);
+const host = process.env.HOST ?? (process.env.PORT ? '0.0.0.0' : 'localhost');
 if (!Number.isInteger(port) || port < 1 || port > 65535) {
   log('error', 'server_failed', { appId, message: 'PORT must be an integer from 1 to 65535' });
   process.exitCode = 1;
-} else if (port !== expectedPort) {
-  log('error', 'server_failed', {
-    appId,
-    message: 'PORT must match the manifest local service port ' + expectedPort,
-  });
-  process.exitCode = 1;
 } else {
-  const server = app.listen(port, 'localhost');
+  const server = app.listen(port, host);
   server.once('listening', () => {
-    log('info', 'server_started', { appId, url: `http://localhost:${port}` });
+    log('info', 'server_started', { appId, url: `http://${host}:${port}` });
   });
   server.once('error', (error: NodeJS.ErrnoException) => {
     log('error', 'server_failed', {
       appId,
       code: error.code,
       message: error.message,
-      url: `http://localhost:${port}`,
+      url: `http://${host}:${port}`,
     });
     process.exitCode = 1;
   });
