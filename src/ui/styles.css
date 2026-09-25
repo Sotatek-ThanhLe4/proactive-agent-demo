@@ -1,0 +1,203 @@
+[data-sota-app="sotaagents-app-proactive-agent"].starter-root {
+  box-sizing: border-box;
+  color: var(--foreground, #15171a);
+  font-family: inherit;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"].starter-result {
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] pre {
+  margin: 12px 0 0;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+/* ── Workspace-chat-like layout ─────────────────────────────────────────── */
+
+[data-sota-app="sotaagents-app-proactive-agent"].proactive-screen {
+  display: flex;
+  flex-direction: column;
+  /* Cho panel một chiều cao THẬT không phụ thuộc chiều cao của cha (cha của
+     host có thể là block cao auto → height:100% sẽ sụp về auto và composer bị
+     đẩy khuất/không cuộn được). Dùng viewport-height để luôn có mốc: `100dvh`
+     là chiều cao mục tiêu, còn `max-height:100dvh` chặn trần để nội dung dài
+     KHÔNG kéo panel giãn quá viewport. `overflow:hidden` + `min-height:0` để
+     phần dư tràn xuống vùng transcript bên trong (nơi mới cuộn), không tràn ra
+     panel. `flex:1 1 auto` để nếu cha TÌNH CỜ là flex có chiều cao thì panel
+     vẫn khít trong đó. Mấu chốt cho overflow trong flex: MỌI tổ tiên trên
+     đường tới vùng cuộn đều có min-height:0 (xem .proactive-conversation và
+     .proactive-transcript-scroll bên dưới). */
+  height: 100dvh;
+  max-height: 100dvh;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-screen-status {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+}
+
+/* Full-width column: the scroll region and composer span the whole panel so the
+   scrollbar sits at the panel's right edge (not floating in the middle). The
+   48rem reading width is applied to the INNER content instead. */
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-conversation {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Scrollable transcript region: full width, scrollbar hugs the right edge. */
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-transcript-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+/* The message list is the element that gets the centered reading width. */
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-transcript {
+  list-style: none;
+  margin: 0 auto;
+  padding: 24px 16px 8px;
+  width: 100%;
+  max-width: 48rem;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* One row per message: avatar + bubble, side depends on the role. */
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-message {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  max-width: 100%;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-message[data-role="user"] {
+  flex-direction: row-reverse;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-avatar {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-bubble {
+  border-radius: 16px;
+  padding: 10px 14px;
+  max-width: min(80%, 40rem);
+  overflow-wrap: anywhere;
+  line-height: 1.55;
+}
+
+/* Assistant: left-aligned on a subtle surface. */
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-message[data-role="assistant"] .proactive-bubble {
+  background: var(--muted, color-mix(in srgb, currentColor 6%, transparent));
+  color: var(--foreground, #15171a);
+  border-bottom-left-radius: 4px;
+}
+
+/* Member: right-aligned in the brand/primary tint. */
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-message[data-role="user"] .proactive-bubble {
+  background: var(--primary, #1267e5);
+  color: var(--primary-foreground, #ffffff);
+  border-bottom-right-radius: 4px;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-bubble :first-child {
+  margin-top: 0;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-bubble :last-child {
+  margin-bottom: 0;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-empty-state {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-empty {
+  color: color-mix(in srgb, currentColor 60%, transparent);
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-error {
+  color: #b42318;
+  padding: 8px 4px;
+}
+
+/* Streaming indicator with animated dots, mirroring workspace chat. */
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-streaming {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 4px 0;
+  padding-left: 42px;
+  font-size: 13px;
+  color: color-mix(in srgb, currentColor 60%, transparent);
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-streaming-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-streaming-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .4;
+  animation: proactive-dot 1.2s infinite ease-in-out;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-streaming-dots span:nth-child(2) {
+  animation-delay: .2s;
+}
+
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-streaming-dots span:nth-child(3) {
+  animation-delay: .4s;
+}
+
+@keyframes proactive-dot {
+  0%, 80%, 100% { opacity: .25; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-2px); }
+}
+
+/* Composer pinned to the bottom, matching the docked "Ask anything" input.
+   Centered to the same 48rem reading width as the transcript. */
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-composer {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 8px 16px 16px;
+}
+
+/* Keep the streaming + error lines aligned with the centered message column. */
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-streaming,
+[data-sota-app="sotaagents-app-proactive-agent"] .proactive-error {
+  width: 100%;
+  max-width: 48rem;
+  margin-left: auto;
+  margin-right: auto;
+}

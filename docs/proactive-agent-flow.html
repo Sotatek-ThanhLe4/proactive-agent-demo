@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Proactive Event-Driven Agent — Luồng hoạt động</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #171a21;
+    --panel-2: #1e222b;
+    --border: #2a2f3a;
+    --fg: #e6e9ef;
+    --muted: #9aa4b2;
+    --brand: #4c8dff;
+    --brand-soft: #1d2b45;
+    --green: #37c26f;
+    --amber: #e0a92b;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 80px; }
+  header h1 { font-size: 30px; margin: 0 0 8px; }
+  header p.sub { color: var(--muted); margin: 0 0 4px; font-size: 15px; }
+  .tag {
+    display: inline-block; font-size: 12px; font-weight: 600;
+    background: var(--brand-soft); color: var(--brand);
+    border: 1px solid #2c4470; border-radius: 999px; padding: 3px 10px; margin-top: 10px;
+  }
+  h2 {
+    font-size: 20px; margin: 44px 0 14px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 16px; margin: 24px 0 8px; }
+  p, li { color: var(--fg); }
+  .muted { color: var(--muted); }
+  code {
+    font-family: var(--mono); font-size: 13px;
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 5px; padding: 1px 6px;
+  }
+  .grid { display: grid; gap: 16px; }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 760px) { .cols-2, .cols-3 { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 20px;
+  }
+  .card h3 { margin-top: 0; }
+  .pill {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; border-radius: 6px; padding: 2px 8px; margin-bottom: 8px;
+  }
+  .pill.be { background: #14324a; color: #7ec2ff; }
+  .pill.sf { background: #16351f; color: #7fe0a0; }
+  .pill.core { background: #3a2f14; color: #f0c866; }
+  .flow { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+  .lane { display: grid; grid-template-columns: 130px 1fr; gap: 14px; align-items: stretch; margin: 0 0 12px; }
+  .lane-label { color: var(--muted); font-size: 13px; font-weight: 600; display: flex; align-items: center; }
+  .steps { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .node {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; font-size: 13px; min-width: 90px; text-align: center;
+  }
+  .node.brand { border-color: #2c4470; }
+  .node.core { border-color: #5a4a1e; background: #241f12; }
+  .node.sf { border-color: #285a34; background: #14251a; }
+  .arrow { color: var(--muted); font-size: 18px; }
+  ol.steps-list { counter-reset: step; list-style: none; padding: 0; margin: 0; }
+  ol.steps-list > li {
+    position: relative; padding: 12px 12px 12px 52px; margin: 0 0 10px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  }
+  ol.steps-list > li::before {
+    counter-increment: step; content: counter(step);
+    position: absolute; left: 14px; top: 12px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--brand); color: #fff; font-weight: 700; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .prop { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+  .prop:last-child { border-bottom: none; }
+  .prop .n { color: var(--brand); font-weight: 700; min-width: 34px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; }
+  .callout {
+    background: var(--brand-soft); border: 1px solid #2c4470; border-radius: 10px;
+    padding: 14px 16px; margin: 16px 0;
+  }
+  .callout strong { color: var(--brand); }
+  footer { margin-top: 50px; color: var(--muted); font-size: 13px; text-align: center; }
+  .diagram {
+    background: #f6f8fc; border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px; margin: 12px 0; overflow-x: auto;
+  }
+  .diagram .mermaid { text-align: center; }
+  .diagram-title { font-size: 14px; font-weight: 600; color: var(--muted); margin: 18px 0 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Proactive Event-Driven Agent</h1>
+    <p class="sub">App SotaAgents độc lập — agent chủ động phản hồi theo Event, tái dùng <code>POST /workspace-chat</code> của Core.</p>
+    <p class="sub muted">Nguyên tắc cốt lõi: chỉ code trong App, KHÔNG sửa Core. Gọi chat bằng session của chính member → conversation + credit đúng người.</p>
+    <span class="tag">App thuần · Không sửa Core</span>
+  </header>
+
+  <h2>1. Tổng quan kiến trúc</h2>
+  <p>App gồm 2 phần chạy trong repo <code>sotaagents-app-proactive-agent</code>. Core chỉ là API được gọi.</p>
+  <div class="grid cols-3">
+    <div class="card">
+      <span class="pill be">App_Backend</span>
+      <h3>Nhận &amp; định tuyến Event</h3>
+      <p class="muted">Nhận Event qua webhook (xác minh chữ ký HMAC), đọc Subject (member). Online → đệm cho Surface poll; Offline → lưu Event_Queue. Đánh dấu đã xử lý để không lặp.</p>
+    </div>
+    <div class="card">
+      <span class="pill sf">App_Surface</span>
+      <h3>Giao diện + gọi chat</h3>
+      <p class="muted">Native module trong workspace chat (slot <code>workspace.nav</code>), chạy trong trình duyệt member (có session). Nạp Context và gọi <code>/workspace-chat</code> bằng session member, render câu trả lời.</p>
+    </div>
+    <div class="card">
+      <span class="pill core">Core</span>
+      <h3>Workspace_Chat_API</h3>
+      <p class="muted">API chat sẵn có. App không tự chạy LLM loop. Core gắn conversation + trừ credit theo member đăng nhập của lượt gọi.</p>
+    </div>
+  </div>
+
+  <h2>2. Luồng hoạt động</h2>
+
+  <h3>2a. Sequence diagram — Member ĐANG online</h3>
+  <p class="diagram-title">Event tới khi member đang mở App → agent tự phản hồi, không cần gõ.</p>
+  <div class="diagram">
+    <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant SRC as Nguồn Event (ngoài)
+    participant BE as App_Backend
+    participant SF as App_Surface (browser member)
+    participant CORE as Core /workspace-chat
+
+    SF->>BE: GET /events/poll (heartbeat, ~5s)
+    Note over BE: markOnline(member) theo poll
+    SRC->>BE: POST /events/proactive (HMAC + Subject)
+    BE->>BE: verify chữ ký, đọc memberId
+    BE->>BE: member online → buffer Online_Delivery
+    SF->>BE: GET /events/poll
+    BE-->>SF: events + Context đã nạp
+    SF->>SF: gộp/lọc nhịp (rate control + type filter)
+    SF->>CORE: POST /workspace-chat (session member)
+    CORE-->>SF: SSE reply (agent thật)
+    SF->>SF: render câu trả lời (ẩn bong bóng event)
+    SF->>BE: POST /events/ack (đã xử lý)
+    </pre>
+  </div>
+
+  <h3>2b. Sequence diagram — Member OFFLINE rồi quay lại</h3>
+  <p class="diagram-title">Offline: chỉ ghi nhận, không chạy agent, không tốn credit. Quay lại: xử lý event tồn.</p>
+  <div class="diagram">
+    <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant SRC as Nguồn Event (ngoài)
+    participant BE as App_Backend
+    participant Q as Event_Queue
+    participant SF as App_Surface
+    participant CORE as Core /workspace-chat
+
+    SRC->>BE: POST /events/proactive (HMAC + Subject)
+    BE->>BE: verify, đọc memberId
+    Note over BE: member offline (không poll)
+    BE->>Q: enqueue(event) status=pending
+    Note over BE,Q: KHÔNG chạy agent · KHÔNG tốn credit
+
+    Note over SF: Member mở lại App_Surface
+    SF->>BE: GET /events/pending
+    BE->>Q: listPending(member)
+    Q-->>BE: [events pending]
+    BE-->>SF: pending events
+    SF->>SF: nạp Context + gộp nhịp
+    SF->>CORE: POST /workspace-chat (session member)
+    CORE-->>SF: SSE reply
+    SF->>BE: POST /events/pending/ack
+    BE->>Q: markProcessed(id)
+    Note over Q: lần mở sau không lặp lại
+    </pre>
+  </div>
+
+  <h3>2c. Data flow — nhận diện &amp; hiển thị hội thoại</h3>
+  <p class="diagram-title">Cách Surface lấy identity, suy conversationId, và nạp lịch sử để hiển thị.</p>
+  <div class="diagram">
+    <pre class="mermaid">
+flowchart LR
+    A["App_Surface mở"] --> B["GET /api/hello<br/>(useAppFetch)"]
+    B --> C["claims: org / workspace / userId"]
+    C --> D["deriveConversationId()<br/>(tất định, 1 hội thoại/member)"]
+    D --> E["GET /api/history/:id/messages<br/>(fetch same-origin)"]
+    E --> F["history state (riêng)"]
+    D --> G["useChatSession(conversationId)<br/>lượt phiên mới"]
+    F --> H["merge + dedupe theo id"]
+    G --> H
+    H --> I["Transcript hiển thị<br/>(ẩn bong bóng event tự sinh)"]
+    </pre>
+  </div>
+
+  <h3>2d. Sơ đồ khối (tóm tắt trực quan)</h3>
+
+  <h3 style="margin-top:8px">Member ĐANG online</h3>
+  <div class="flow">
+    <div class="lane">
+      <div class="lane-label">Nguồn ngoài</div>
+      <div class="steps">
+        <div class="node">Event (gắn Subject = member)</div>
+        <span class="arrow">→</span>
+        <div class="node brand">POST /events/proactive<br/><span class="muted">(HMAC verify)</span></div>
+      </div>
+    </div>
+    <div class="lane">
+      <div class="lane-label">App_Backend</div>
+      <div class="steps">
+        <div class="node brand">Đọc Subject</div>
+        <span class="arrow">→</span>
+        <div class="node brand">Member online?</div>
+        <span class="arrow">→</span>
+        <div class="node brand">Đệm Online_Delivery</div>
+      </div>
+    </div>
+    <div class="lane">
+      <div class="lane-label">App_Surface</div>
+      <div class="steps">
+        <div class="node sf">Poll /events/poll (~5s, heartbeat)</div>
+        <span class="arrow">→</span>
+        <div class="node">Nạp Context + gộp/lọc nhịp</div>
+        <span class="arrow">→</span>
+        <div class="node core">POST /workspace-chat<br/><span class="muted">(session member)</span></div>
+        <span class="arrow">→</span>
+        <div class="node">Render + ack</div>
+      </div>
+    </div>
+    <p class="muted" style="margin:6px 0 0">Member không cần gõ gì — agent tự phản hồi. Sau khi lượt chạy, Surface ack để Event không bị giao lại.</p>
+  </div>
+
+  <h3 style="margin-top:8px">Member OFFLINE rồi quay lại</h3>
+  <div class="flow">
+    <div class="lane">
+      <div class="lane-label">App_Backend</div>
+      <div class="steps">
+        <div class="node">Event tới</div>
+        <span class="arrow">→</span>
+        <div class="node brand">Member offline</div>
+        <span class="arrow">→</span>
+        <div class="node brand">Lưu Event_Queue<br/><span class="muted">KHÔNG chạy agent · KHÔNG tốn credit</span></div>
+      </div>
+    </div>
+    <div class="lane">
+      <div class="lane-label">Khi mở lại</div>
+      <div class="steps">
+        <div class="node sf">Surface mở → GET /events/pending</div>
+        <span class="arrow">→</span>
+        <div class="node">Nạp Context + gộp nhịp</div>
+        <span class="arrow">→</span>
+        <div class="node core">POST /workspace-chat (session member)</div>
+        <span class="arrow">→</span>
+        <div class="node brand">Đánh dấu processed</div>
+      </div>
+    </div>
+    <p class="muted" style="margin:6px 0 0">Event không bao giờ mất; xử lý xong đánh dấu đã xử lý nên lần mở sau không lặp lại.</p>
+  </div>
+
+  <h2>3. Vòng đời một Event (chi tiết)</h2>
+  <ol class="steps-list">
+    <li><strong>Nhận Event.</strong> Nguồn ngoài gửi <code>POST /events/proactive</code> kèm chữ ký HMAC-SHA256 trên raw body. Backend xác minh chữ ký (sai → 401), đọc <code>memberId</code> (Subject). Thiếu Subject → 422.</li>
+    <li><strong>Định tuyến theo presence.</strong> Member online → đệm cho Surface poll. Member offline → lưu vào Event_Queue theo member (không chạy agent, không tốn credit).</li>
+    <li><strong>Nạp Context.</strong> App diễn giải payload nghiệp vụ thành turn text, kèm chỉ dẫn hành động (“tóm tắt + đề xuất, tra KB nếu cần”). Payload đầy đủ được đưa vào để agent có giá trị thật, không chỉ tên field.</li>
+    <li><strong>Kiểm soát nhịp.</strong> Gộp event dồn dập → tối đa một lượt/cửa sổ; trần lượt/member; chỉ loại event “đáng phản hồi” mới chạy, loại khác chỉ ghi nhận.</li>
+    <li><strong>Chạy lượt agent.</strong> Surface gọi <code>POST /workspace-chat</code> bằng session member → Core gắn đúng conversation + trừ đúng credit; SSE trả lời stream về.</li>
+    <li><strong>Render &amp; đánh dấu.</strong> Câu trả lời hiển thị trong giao diện App; Event được ack/đánh dấu đã xử lý để không lặp.</li>
+  </ol>
+
+  <h2>4. Mô hình dữ liệu</h2>
+  <div class="grid cols-2">
+    <div class="card"><h3>MemberConversationMap</h3><p class="muted">member → conversationId tất định (<code>deriveConversationId</code>). Mỗi member đúng một hội thoại.</p></div>
+    <div class="card"><h3>Event_Queue</h3><p class="muted">Theo member; mỗi event <code>{type, payload, subject, receivedAt, status: pending|processed}</code>.</p></div>
+    <div class="card"><h3>PresenceState</h3><p class="muted">member → online/offline, theo heartbeat poll của Surface (TTL).</p></div>
+    <div class="card"><h3>RateState</h3><p class="muted">Đếm lượt/member trong cửa sổ + trạng thái debounce (gộp).</p></div>
+  </div>
+
+  <h2>5. Các tính chất đúng đắn (Correctness Properties)</h2>
+  <div class="card">
+    <div class="prop"><span class="n">P1</span><span>Không sửa Core — toàn bộ code trong repo App, chạy với Core không đổi.</span></div>
+    <div class="prop"><span class="n">P2</span><span>Credit đúng member — mọi lượt gọi bằng session member, không dùng service account.</span></div>
+    <div class="prop"><span class="n">P3</span><span>Offline không tiêu credit — chỉ ghi Event_Queue, không chạy agent.</span></div>
+    <div class="prop"><span class="n">P4</span><span>Event không mất — event offline nằm trong queue tới khi xử lý hoặc hết hạn.</span></div>
+    <div class="prop"><span class="n">P5</span><span>Không xử lý lại — event đã xử lý được đánh dấu, không tạo lượt mới.</span></div>
+    <div class="prop"><span class="n">P6</span><span>Một hội thoại/member — ánh xạ tất định.</span></div>
+    <div class="prop"><span class="n">P7</span><span>Kiểm soát nhịp — event dồn dập tạo tối đa một lượt/cửa sổ; loại không đáng phản hồi không tạo lượt.</span></div>
+  </div>
+
+  <h2>6. Endpoint chính</h2>
+  <table>
+    <tr><th>Endpoint</th><th>Vai trò</th></tr>
+    <tr><td><code>POST /events/proactive</code></td><td>Nhận Event từ nguồn ngoài (HMAC verify). 202 accept · 401 sai chữ ký · 422 thiếu Subject.</td></tr>
+    <tr><td><code>GET /events/poll</code></td><td>Surface poll khi online (kèm heartbeat giữ presence). Trả event đã đệm + Context.</td></tr>
+    <tr><td><code>POST /events/ack</code></td><td>Ack event online đã xử lý.</td></tr>
+    <tr><td><code>GET /events/pending</code></td><td>Surface lấy event tồn khi mở lại (offline queue).</td></tr>
+    <tr><td><code>POST /events/pending/ack</code></td><td>Đánh dấu event tồn đã xử lý (không lặp).</td></tr>
+    <tr><td><code>GET /api/hello</code></td><td>Trả identity member (org/workspace/user) từ token đã verify — Surface dùng để suy conversationId.</td></tr>
+  </table>
+
+  <h2>7. Ghi chú vận hành</h2>
+  <div class="callout">
+    <p><strong>Nhận diện member:</strong> Surface lấy userId từ <code>/api/hello</code> (claim đã verify) thay vì auth store của host — vì native module không luôn được hydrate store.</p>
+    <p><strong>Gọi backend qua tunnel:</strong> các route <code>/events/*</code> gọi qua <code>useAppFetch</code> (đường app-scoped). Endpoint Core như history gọi <code>/api/history/:id/messages</code> bằng fetch same-origin.</p>
+    <p><strong>Lịch sử hội thoại:</strong> host <code>useChatSession</code> không tự nạp history; App tự fetch history của conversation rồi hợp nhất (dedupe theo id) với lượt phiên để hiển thị.</p>
+    <p><strong>Ẩn bong bóng event:</strong> lượt do event tự sinh được ẩn khỏi transcript (chỉ hiện câu trả lời của agent); tin member gõ tay vẫn hiện bình thường.</p>
+  </div>
+
+  <footer>
+    Proactive Event-Driven Agent · App thuần, không sửa Core · Tài liệu luồng hoạt động
+  </footer>
+</div>
+<script>
+  // Mermaid được nạp từ CDN. Nếu mở offline (không có mạng), các sơ đồ sẽ hiển
+  // thị dưới dạng text nguồn — vẫn đọc được, và các sơ đồ khối bên dưới không
+  // phụ thuộc Mermaid nên luôn hiển thị.
+  if (window.mermaid) {
+    window.mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+  }
+</script>
+</body>
+</html>

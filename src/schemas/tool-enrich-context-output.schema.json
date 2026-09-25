@@ -1,0 +1,78 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "found": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "App-owned enriched business data. Core forwards it untouched."
+        }
+      },
+      "required": [
+        "found",
+        "type",
+        "reference",
+        "summary",
+        "data"
+      ]
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason",
+        "message"
+      ]
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "organizationId": {
+          "type": "string"
+        },
+        "workspaceId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "organizationId",
+        "workspaceId"
+      ]
+    }
+  },
+  "required": [
+    "ok",
+    "context"
+  ]
+}

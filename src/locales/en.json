@@ -1,0 +1,20 @@
+{
+  "admin.title": "Admin screen",
+  "tool.result.title": "Example result",
+  "surface.eyebrow": "Proactive agent",
+  "surface.title": "Your assistant",
+  "surface.loading": "Loading your session…",
+  "surface.identity_error": "We couldn't identify your workspace session yet. Try reopening this panel.",
+  "surface.conversation_label": "Your conversation with the agent",
+  "surface.conversation_id_label": "Conversation",
+  "surface.conversation_loading": "Opening your conversation…",
+  "surface.conversation_streaming": "The agent is replying…",
+  "surface.conversation_error": "Something went wrong reaching the agent. Try again shortly.",
+  "surface.conversation_empty": "No messages yet. The agent will respond here when there's something to handle.",
+  "surface.empty_title": "Your assistant is ready",
+  "surface.role_assistant": "Agent",
+  "surface.role_member": "You",
+  "surface.avatar_agent": "AI",
+  "surface.avatar_member": "You",
+  "surface.composer_placeholder": "Ask anything"
+}

@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Business kind of thing to enrich, e.g. \"order\", \"ticket\", \"cart\". App-owned taxonomy; Core does not interpret it."
+    },
+    "reference": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400,
+      "description": "Identifier to look up, typically taken from the proactive Event payload (e.g. an order id)."
+    },
+    "hints": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Optional free-form hints the tenant resolver may use (e.g. locale, requested fields)."
+    }
+  },
+  "required": [
+    "type",
+    "reference"
+  ]
+}

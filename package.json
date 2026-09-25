@@ -1,0 +1,42 @@
+{
+  "name": "sotaagents-app-proactive-agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:sota": "sota dev",
+    "lint": "sota validate",
+    "deploy": "sota deploy",
+    "dev:backend": "tsx watch src/backend/server.ts",
+    "build:backend": "tsc -p tsconfig.backend.json",
+    "start": "node dist/backend/server.js",
+    "test": "node --import tsx --test src/backend/*.test.ts src/ui/*.test.ts",
+    "build": "tsc -p tsconfig.backend.json && sota contracts ensure && vite build --config vite.config.ts",
+    "dev": "concurrently --kill-others --names backend,ui \"tsx watch src/backend/server.ts\" \"sota contracts ensure && vite build --watch --config vite.config.ts\"",
+    "typecheck": "sota contracts ensure && tsc -p tsconfig.backend.json --noEmit && tsc -p tsconfig.ui.json --noEmit",
+    "dev:ui": "sota contracts ensure && vite build --watch --config vite.config.ts",
+    "build:ui": "sota contracts ensure && vite build --config vite.config.ts",
+    "predeploy": "tsc -p tsconfig.backend.json && sota contracts ensure && vite build --config vite.config.ts"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "jose": "^6.2.3",
+    "dotenv": "^17.2.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.4.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^6.0.2",
+    "vite": "^8.0.0",
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

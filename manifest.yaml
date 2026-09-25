@@ -1,0 +1,82 @@
+manifestSchemaVersion: 3
+appId: sotaagents-app-proactive-agent
+version: 1.0.0
+displayName: "Sotaagents App Proactive Agent"
+description: "SotaAgent app."
+publisher:
+  id: sotatek
+  displayName: "Sotatek"
+  contact: dev@sotatek.example
+contributes:
+  skills: []
+  tools:
+    - name: example
+      description: Example tool that echoes its input and verified tenant context.
+      route: POST /tools/example
+      inputSchema: src/schemas/tool-input.schema.json
+      outputSchema: src/schemas/tool-output.schema.json
+      timeoutMs: 15000
+      failure_mode: abort
+    # Task 14 (Req 11.3): optional context-enrichment tool the agent may call at
+    # runtime to fetch business data related to the proactive Event (e.g. look
+    # up an order/ticket by id). Enrichment logic is a tenant-overridable seam;
+    # failure_mode: skip so a missing/failed enrichment never aborts the turn.
+    - name: enrich-context
+      description: Enrich business data related to the proactive Event (e.g. look up an order or ticket by id from the payload).
+      route: POST /tools/enrich-context
+      inputSchema: src/schemas/tool-enrich-context-input.schema.json
+      outputSchema: src/schemas/tool-enrich-context-output.schema.json
+      timeoutMs: 15000
+      failure_mode: skip
+  events:
+    # Proactive Event_Ingress (Req 1.6): the App receives a business Event from
+    # the internal bus, loads context, and calls Core's Proactive_Turn_API.
+    # An external webhook may target the same route; both end in the same call.
+    - eventType: proactive.event
+      route: POST /events/proactive
+      timeoutMs: 20000
+      failure_mode: skip
+      idempotencyKey: "{{ payload.idempotencyKey }}"
+  ui:
+    # App_Surface (Req 8.1, 8.2): the button / entry point in workspace chat.
+    # OQ2 resolved to `page` (workspace.nav tab) — opening it shows the member's
+    # single, deterministic Conversation (Req 3).
+    - id: proactive-agent-screen
+      kind: nativeModule
+      surface: page
+      slot: workspace.nav
+      sectionId: proactive-agent
+      label: Proactive Agent
+      route: /proactive-agent/*
+      module:
+        entry: dist/ui/app.js
+        export: ProactiveAgentScreen
+        styles: dist/ui/app.css
+    - id: example-tool-result
+      kind: nativeModule
+      surface: tool-view
+      slot: chat.message.inline.below
+      label: Example result
+      toolNames:
+        - example
+      renderBeforeOutput: true
+      module:
+        entry: dist/ui/app.js
+        export: ExampleToolResult
+        styles: dist/ui/app.css
+service:
+  baseUrl: https://sotaagents-app-proactive-agent.invalid
+health:
+  url: https://sotaagents-app-proactive-agent.invalid/health
+  intervalSeconds: 60
+environments:
+  local:
+    service:
+      baseUrl: http://localhost:8787
+    health:
+      url: http://localhost:8787/health
+platform: ^1.2.0
+locales:
+  default: en
+  files:
+    en: src/locales/en.json
