@@ -1,0 +1,16 @@
+# Nixpacks build config for Railway.
+# The default `npm run build` script pulls in `sota contracts ensure` + vite
+# (Sota CLI, only for the App UI) which is NOT available on Railway and would
+# fail the build. Here we build ONLY the backend and start the compiled server.
+
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["npm run build:backend"]
+
+[start]
+cmd = "npm run start"
